@@ -7,6 +7,15 @@ Yay cats!
 go run main.go
 ```
 
+## Building the Docker image
+
+```bash
+docker build -f DOCKERFILE . -t catservice
+docker run -p 80:80 catservice
+```
+
+## Running it in kubernetes with Istio
+
 ### Creating a GKE cluster with Istio & Prometheus
 
 ```bash
