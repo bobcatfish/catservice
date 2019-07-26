@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: cats-virtualservice
+  namespace: catspace
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - cats-gateway
+  http:
+  - route:
+    - destination:
+        host: cats-service
