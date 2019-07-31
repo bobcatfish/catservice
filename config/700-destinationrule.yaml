@@ -9,6 +9,6 @@ spec:
     tls:
       mode: ISTIO_MUTUAL
   subsets:
-  - name: baseline
+  - name: production
     labels:
-      version: baseline
+      version: production

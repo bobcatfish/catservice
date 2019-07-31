@@ -22,7 +22,7 @@ spec:
         prometheus.io/scrape: "true"
       labels:
         app: cats
-        version: baseline
+        version: production
     spec:
       containers:
       - name: catservice
