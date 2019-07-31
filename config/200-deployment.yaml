@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cats
+  name: cats #
   namespace: catspace
   labels:
-    app: cats
+    app: cats #
 spec:
   minReadySeconds: 5
   revisionHistoryLimit: 5
@@ -15,18 +15,17 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: cats
+      app: cats #
   template:
     metadata:
       annotations:
         prometheus.io/scrape: "true"
       labels:
-        app: cats
+        app: cats #
     spec:
       containers:
       - name: catservice
-        # TODO: really my cat service
-        image: nginxdemos/hello
+        image: gcr.io/christiewilson-catfactory/catservice
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
