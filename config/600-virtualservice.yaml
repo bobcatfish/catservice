@@ -12,3 +12,5 @@ spec:
   - route:
     - destination:
         host: cats-service
+        subset: baseline
+      weight: 100

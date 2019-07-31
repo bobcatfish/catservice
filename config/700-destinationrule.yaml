@@ -9,6 +9,6 @@ spec:
     tls:
       mode: ISTIO_MUTUAL
   subsets:
-  - name: catservice
+  - name: baseline
     labels:
-      app: cats
+      version: baseline
