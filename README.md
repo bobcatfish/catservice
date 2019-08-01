@@ -20,7 +20,7 @@ docker run -p 80:80 catservice
 
 ```bash
 export PROJECT_ID=christiewilson-catfactory
-export CLUSTER_NAME=canary-cluster
+export CLUSTER_NAME=ilovecats
 
 gcloud beta container clusters create $CLUSTER_NAME \
  --enable-autoscaling \
@@ -30,7 +30,7 @@ gcloud beta container clusters create $CLUSTER_NAME \
  --enable-basic-auth \
  --no-issue-client-certificate \
  --project=$PROJECT_ID \
- --region=us-central1 \
+ --region=asia-northeast1 \
  --machine-type=n1-standard-4 \
  --image-type=cos \
  --num-nodes=1 \
@@ -42,9 +42,6 @@ gcloud beta container clusters create $CLUSTER_NAME \
 kubectl create clusterrolebinding cluster-admin-binding \
 --clusterrole=cluster-admin \
 --user=$(gcloud config get-value core/account)
-
-# Latest version of istio (1.1.7) doesn't seem to have prometheus released with it?
-kubectl -n istio-system apply -f  https://storage.googleapis.com/gke-release/istio/release/1.0.6-gke.3/patches/install-prometheus.yaml
 ```
 
 ### Once it's setup
