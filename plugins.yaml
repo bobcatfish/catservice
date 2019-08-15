@@ -1,11 +1,11 @@
 approve:
 - repos:
-  - bobcatfish
+  - bobcatfish/catservice
   implicit_self_approve: true
   review_acts_as_approve: true
 
 plugins:
-  bobcatfish:
+  bobcatfish/catservice:
   - approve
   - assign
   - blunderbuss
