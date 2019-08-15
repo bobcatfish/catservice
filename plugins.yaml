@@ -6,5 +6,24 @@ approve:
 
 plugins:
   bobcatfish:
-  - size
+  - approve
+  - assign
+  - blunderbuss
+  - buildifier
   - cat
+  - dog
+  - golint
+  - heart
+  - help
+  - hold
+  - label
+  - lgtm
+  - lifecycle
+  - milestone
+  - shrug
+  - size
+  - skip
+  - trigger
+  - verify-owners
+  - wip
+  - yuks
