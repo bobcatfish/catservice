@@ -1,0 +1,10 @@
+approve:
+- repos:
+  - bobcatfish
+  implicit_self_approve: true
+  review_acts_as_approve: true
+
+plugins:
+  bobcatfish:
+  - size
+  - cat
