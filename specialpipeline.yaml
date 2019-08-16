@@ -19,7 +19,7 @@ spec:
     command:
     - cat
     args:
-    - README.md
+    - /workspace/git/README.md
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
