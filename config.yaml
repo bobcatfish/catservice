@@ -20,7 +20,7 @@ presubmits:
     #rerun_command: "/run do-the-pipeline"
     #trigger: "(?m)^/run do-the-pipeline,?(\\s+|$)"
     always_run: true
-    #skip_report: true
+    skip_report: false
     pipeline_run_spec:
       trigger:
         type: manual
