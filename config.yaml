@@ -17,8 +17,8 @@ presubmits:
   bobcatfish/catservice:
   - name: do-the-pipeline
     agent: tekton-pipeline
-    #rerun_command: "/run do-the-pipeline"
-    #trigger: "(?m)^/run do-the-pipeline,?(\\s+|$)"
+    rerun_command: "/run do-the-pipeline"
+    trigger: "(?m)^/run do-the-pipeline,?(\\s+|$)"
     always_run: true
     skip_report: false
     pipeline_run_spec:
