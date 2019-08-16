@@ -22,6 +22,8 @@ presubmits:
     always_run: true
     #skip_report: true
     pipeline_run_spec:
+      trigger:
+        type: manual
       pipelineRef:
         name: special-pipeline
       resources:
