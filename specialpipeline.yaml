@@ -1,0 +1,39 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: cool-stuff
+spec:
+  inputs:
+    resources:
+    - name: git
+      type: git
+  steps:
+  - name: say-hi
+    image: busybox
+    command:
+    - echo
+    args:
+    - "hi scott!"
+  - name: cat-file
+    image: busybox
+    command:
+    - cat
+    args:
+    - README.md
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: special-pipeline
+spec:
+  resources:
+  - name: git
+    type: git
+  tasks:
+  - name: cool-stuff
+    taskRef:
+      name: cool-stuff
+    resources:
+      inputs:
+      - name: git
+        resource: git
