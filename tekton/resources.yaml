@@ -32,4 +32,4 @@ spec:
   type: image
   params:
    - name: url
-     value: catservice
+     value: cmd/catservice

@@ -6,13 +6,15 @@ metadata:
 spec:
   pipelineRef:
     name: pipeline-release
+  trigger:
+    type: manual
   params:
   - name: package
     value: github.com/bobcatfish/catservice
   - name: imageRegistry
     value: gcr.io/christiewilson-catfactory
   resources:
-  - name: source-repo
+  - name: catservice
     resourceRef:
       name: catservice
   - name: bucket

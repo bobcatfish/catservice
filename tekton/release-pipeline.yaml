@@ -27,7 +27,7 @@ spec:
       resources:
         inputs:
           - name: source
-            resource: source-repo
+            resource: catservice
     - name: unit-tests
       runAfter: [lint]
       taskRef:
@@ -38,20 +38,9 @@ spec:
       resources:
         inputs:
           - name: source
-            resource: source-repo
-    - name: build
-      runAfter: [lint]
-      taskRef:
-        name: golang-build
-      params:
-        - name: package
-          value: ${params.package}
-      resources:
-        inputs:
-          - name: source
-            resource: source-repo
+            resource: catservice
     - name: publish-images
-      runAfter: [build, unit-tests]
+      runAfter: [lint, unit-tests]
       taskRef:
         name: publish-tekton-pipelines
       params:
@@ -62,7 +51,7 @@ spec:
       resources:
         inputs:
           - name: source
-            resource: source-repo
+            resource: catservice
           - name: bucket
             resource: bucket
         outputs:
