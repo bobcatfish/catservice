@@ -1,0 +1,29 @@
+approve:
+- repos:
+  - bobcatfish/catservice
+  implicit_self_approve: true
+  review_acts_as_approve: true
+
+plugins:
+  bobcatfish/catservice:
+  - approve
+  - assign
+  - blunderbuss
+  - buildifier
+  - cat
+  - dog
+  - golint
+  - heart
+  - help
+  - hold
+  - label
+  - lgtm
+  - lifecycle
+  - milestone
+  - shrug
+  - size
+  - skip
+  - trigger
+  - verify-owners
+  - wip
+  - yuks
