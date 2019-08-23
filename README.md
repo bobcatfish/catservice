@@ -4,7 +4,7 @@ Yay cats!
 ## Running it
 
 ```bash
-go run main.go
+go run cmd/main.go
 ```
 
 ## Building the Docker image
