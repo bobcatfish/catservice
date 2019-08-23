@@ -38,39 +38,32 @@ presubmits:
         resourceRef:
           name: PROW_IMPLICIT_GIT_REF
 
-#presubmits:
-#  bobcatfish/catservice:
-#  - name: some-kinda-test
-#    agent: kubernetes
-#    always_run: true
-#    rerun_command: "/test pull-tekton-cli-build-tests"
-#    trigger: "(?m)^/test (all|pull-tekton-cli-build-tests),?(\\s+|$)"
-#    spec:
-#      containers:
-#      - image: gcr.io/tekton-releases/tests/test-runner@sha256:a4a64b2b70f85a618bbbcc6c0b713b313b2e410504dee24c9f90ec6fe3ebf63f
-#        imagePullPolicy: Always
-#        args:
-#        - "--scenario=kubernetes_execute_bazel"
-#        - "--clean"
-#        - "--job=$(JOB_NAME)"
-#        - "--repo=github.com/$(REPO_OWNER)/$(REPO_NAME)=$(PULL_REFS)"
-#        - "--root=/go/src"
-#        - "--service-account=/etc/test-account/service-account.json"
-#        - "--upload=gs://tekton-prow/pr-logs"
-#        - "--" # end bootstrap args, scenario args below
-#        - "--" # end kubernetes_execute_bazel flags (consider following flags as text)
-#        - "./test/presubmit-tests.sh"
-#        - "--build-tests"
-#        volumeMounts:
-#        - name: test-account
-#          mountPath: /etc/test-account
-#          readOnly: true
-#        env:
-#        - name: GOOGLE_APPLICATION_CREDENTIALS
-#          value: /etc/test-account/service-account.json
-#        - name: E2E_CLUSTER_REGION
-#          value: us-central1
-#      volumes:
-#      - name: test-account
-#        secret:
-#          secretName: test-account
+periodics:
+- cron: "* * * * *"
+  name: make-release
+  agent: tekton-pipeline
+  extra_refs:
+  - org: bobcatfish
+    repo: catservice
+    base_ref: nightly
+  pipeline_run_spec:
+    trigger:
+      type: manual
+    pipelineRef:
+      name: pipeline-release
+    params:
+    - name: package
+      value: github.com/bobcatfish/catservice
+    - name: imageRegistry
+      value: gcr.io/christiewilson-catfactory
+    resources:
+    - name: bucket
+      resourceRef:
+        name: catservice-bucket
+    - name: catservice-image
+      resourceRef:
+        name: catservice-image
+    - name: catservice
+      resourceRef:
+        name: PROW_EXTRA_GIT_REF_0
+
