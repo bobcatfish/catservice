@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: catservice
-        image: gcr.io/christiewilson-catfactory/catservice:0.0.3
+        image: github.com/bobcatfish/catservice
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
