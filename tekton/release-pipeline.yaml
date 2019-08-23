@@ -1,0 +1,72 @@
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: pipeline-release
+spec:
+  params:
+  - name: package
+    description: package to release
+  - name: imageRegistry
+  resources:
+  - name: catservice
+    type: git
+  - name: bucket
+    type: storage
+  - name: catservice-image
+    type: image
+  tasks:
+    - name: lint
+      taskRef:
+        name: golangci-lint
+      params:
+        - name: package
+          value: ${params.package}
+        - name: flags
+          value: -v
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+    - name: unit-tests
+      runAfter: [lint]
+      taskRef:
+        name: golang-test
+      params:
+        - name: package
+          value: ${params.package}
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+    - name: build
+      runAfter: [lint]
+      taskRef:
+        name: golang-build
+      params:
+        - name: package
+          value: ${params.package}
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+    - name: publish-images
+      runAfter: [build, unit-tests]
+      taskRef:
+        name: publish-tekton-pipelines
+      params:
+        - name: pathToProject
+          value: ${params.package}
+        - name: imageRegistry
+          value: ${params.imageRegistry}
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+          - name: bucket
+            resource: bucket
+        outputs:
+          - name: bucket
+            resource: bucket
+          - name: builtCatService
+            resource: catservice-image
