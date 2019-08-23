@@ -127,7 +127,7 @@ spec:
       do
         IMAGE_WITHOUT_SHA=${IMAGE%%@*}
         gcloud -q container images add-tag ${IMAGE} ${IMAGE_WITHOUT_SHA}:latest
-        gcloud -q container images add-tag ${IMAGE} ${IMAGE_WITHOUT_SHA}:VERSION_TAG
+        gcloud -q container images add-tag ${IMAGE} ${IMAGE_WITHOUT_SHA}:$VERSION_TAG
         for REGION in "${REGIONS[@]}"
         do
           for TAG in "latest" $VERSION_TAG
@@ -136,6 +136,9 @@ spec:
           done
         done
       done
+    volumeMounts:
+      - name: gcp-secret
+        mountPath: /secret
 
   volumes:
     - name: gcp-secret

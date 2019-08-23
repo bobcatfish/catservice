@@ -39,3 +39,24 @@ spec:
         inputs:
           - name: source
             resource: catservice
+    - name: publish-images
+      runAfter: [lint, unit-tests]
+      taskRef:
+        name: publish-tekton-pipelines
+      params:
+        - name: pathToProject
+          value: ${params.package}
+        - name: imageRegistry
+          value: ${params.imageRegistry}
+      resources:
+        inputs:
+          - name: source
+            resource: catservice
+          - name: bucket
+            resource: bucket
+        outputs:
+          - name: bucket
+            resource: bucket
+          - name: builtCatService
+            resource: catservice-image
+
