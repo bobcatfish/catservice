@@ -1,0 +1,68 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: update-image
+spec:
+  inputs:
+    params:
+    - name: pathToDeployment
+      description: Path to yaml file of the Deployment to update the image of.
+    - name: tag
+      description: Tag of the image to use for the canary.
+    resources:
+    - name: source
+      type: git
+    - name: image
+      type: image
+    - name: cluster
+      type: cluster
+
+  steps:
+  - name: create-yq-deployment-script
+    image: mikefarah/yq
+    workingDir: "${inputs.resources.source.path}"
+    command:
+    - /bin/sh
+    args:
+    - -ce
+    - |
+      set -e
+      set -x
+      export YQ_CONFIG="/builder/home/yq-deployment-config.yaml"
+
+      cat <<EOF > $YQ_CONFIG
+      spec.template.spec.containers[0].image: ${inputs.resources.image.url}:${inputs.params.tag}
+      EOF
+
+      cat $YQ_CONFIG
+
+  - name: create-canary-deployment-config
+    image: mikefarah/yq
+    workingDir: "${inputs.resources.source.path}"
+    command: ['yq']
+    args:
+    - w
+    - -i
+    - -s
+    - /builder/home/yq-deployment-config.yaml
+    - ${inputs.params.pathToDeployment}
+
+  - name: cat-deployment
+    image: mikefarah/yq
+    workingDir: "${inputs.resources.source.path}"
+    command: ['cat']
+    args:
+    - ${inputs.params.pathToDeployment}
+
+  - name: apply
+    image: lachlanevenson/k8s-kubectl
+    workingDir: "${inputs.resources.source.path}"
+    command: ['kubectl']
+    args:
+    - 'apply'
+    - '--kubeconfig'
+    - '/workspace/${inputs.resources.cluster.name}/kubeconfig'
+    - '-f'
+    - ${inputs.params.pathToDeployment}
+  
+  # TODO: once we can have git outputs, we should update the deployment in the repo

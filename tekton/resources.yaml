@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: christie-catservice-image
+spec:
+  type: image
+  params:
+  - name: url
+    value: gcr.io/christiewilson-catfactory/catservice
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: catservice
+spec:
+  type: git
+  params:
+  - name: revision
+    value:  new_awesome_demo
+  - name: url
+    value: https://github.com/bobcatfish/catservice
