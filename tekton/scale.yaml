@@ -1,0 +1,108 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: scale
+spec:
+  inputs:
+    params:
+    - name: baselinePercent
+      description: Percentage of traffic to direct to baseline subset
+    - name: canaryPercent
+      description: Percentage of traffic to direct to canary subset
+    - name: pathToVirtualService
+      description: Path to yaml file of the VirtualService that routes to the service to canary (can be relative to the path to the repo).
+    - name: pauseSeconds
+      description: Number of seconds to pause for after updating the weightings
+      default: "10"
+    resources:
+    - name: source
+      type: git
+    - name: cluster
+      type: cluster
+
+  steps:
+  - name: get-virtual-service-name
+    image: mikefarah/yq
+    workingDir: "${inputs.resources.source.path}"
+    command:
+    - /bin/sh
+    args:
+    - -ce
+    - |
+      set -e
+      set -x
+      export NAME="$(yq read ${inputs.params.pathToVirtualService} metadata.name)"
+      export NAMESPACE="$(yq read ${inputs.params.pathToVirtualService} metadata.namespace)"
+
+      echo $NAME > "/builder/home/name"
+      echo $NAMESPACE > "/builder/home/namespace"
+
+  - name: get-virtual-service
+    image: lachlanevenson/k8s-kubectl
+    workingDir: "${inputs.resources.source.path}"
+    command:
+    - /bin/sh
+    args:
+    - -ce
+    - |
+      set -e
+      set -x
+
+      export NAME="$(cat /builder/home/name)"
+      export NAMESPACE="$(cat /builder/home/namespace)"
+
+      kubectl --kubeconfig /workspace/${inputs.resources.cluster.name}/kubeconfig \
+        get virtualservice $NAME -n $NAMESPACE -o yaml > ${inputs.params.pathToVirtualService}
+
+  - name: create-yq-update-script
+    image: mikefarah/yq
+    workingDir: "${inputs.resources.source.path}"
+    command:
+    - /bin/sh
+    args:
+    - -ce
+    - |
+      set -e
+      set -x
+
+      export YQ_CONFIG="/builder/home/yq-virtualservice-config.yaml"
+      cat <<EOF > $YQ_CONFIG
+      spec.http[0].route[0].weight: ${inputs.params.baselinePercent}
+      spec.http[0].route[1].weight: ${inputs.params.canaryPercent}
+      EOF
+
+      cat $YQ_CONFIG
+
+  - name: create-update-config
+    image: mikefarah/yq
+    workingDir: "${inputs.resources.source.path}"
+    command: ['yq']
+    args:
+    - w
+    - -i
+    - -s
+    - /builder/home/yq-virtualservice-config.yaml
+    - ${inputs.params.pathToVirtualService}
+
+  - name: cat-update
+    image: mikefarah/yq
+    workingDir: "${inputs.resources.source.path}"
+    command: ['cat']
+    args:
+    - ${inputs.params.pathToVirtualService}
+
+  - name: apply-update
+    image: lachlanevenson/k8s-kubectl
+    workingDir: "${inputs.resources.source.path}"
+    command: ['kubectl']
+    args:
+    - 'apply'
+    - '--kubeconfig'
+    - '/workspace/${inputs.resources.cluster.name}/kubeconfig'
+    - '-f'
+    - ${inputs.params.pathToVirtualService}
+  
+  - name: pause
+    image: busybox
+    command: ['sleep']
+    args: ['${inputs.params.pauseSeconds}']
