@@ -16,6 +16,6 @@ spec:
   type: git
   params:
   - name: revision
-    value:  new_awesome_demo
+    value:  master
   - name: url
     value: https://github.com/bobcatfish/catservice
