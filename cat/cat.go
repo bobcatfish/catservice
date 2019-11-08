@@ -21,7 +21,9 @@ type Cat struct {
 // AgeInCatYears will look at how old c is in human years and convert that to the
 // cat years equivalent.
 func AgeInCatYears(hoomanYears int) int {
-	return hoomanYears
+	// One cat year is the equivalent of about 7 cat years, right?
+	// But I've heard it's a bit more complicated...
+	return hoomanYears * 7
 }
 
 // Yoshimi is my ancient cat.
