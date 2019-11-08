@@ -4,6 +4,15 @@ We have 2 pipelines:
 * [pr-pipline.yaml](./pr-pipeline.yaml) is for testing before merging
 * [deploy-pipeline.yaml](./deploy-pipeline.yaml) is for testing after merging
 
+## Triggers
+
+Triggering is configured with [triggers.yaml](./triggers.yaml).
+
+```bash
+# Have to build the github validator
+ko apply -f tekton/triggers.yaml
+```
+
 ## Running the PR Pipeline
 
 This Pipeline uses [golang-test](https://github.com/tektoncd/catalog/tree/master/golang#golang-test) 
