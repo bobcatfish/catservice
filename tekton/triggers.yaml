@@ -1,0 +1,114 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: catservice-pr-triggertemplate
+  namespace: getting-started
+spec:
+  params:
+    - name: gitrevision
+      description: The git revision
+      default: master
+    - name: gitrepositoryurl
+      description: The git repository url
+    - name: namespace
+      description: The namespace to create the resources
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineResource
+      metadata:
+        name: source-repo-$(uid)
+        namespace: $(params.namespace)
+      spec:
+        type: git
+        params:
+        - name: revision
+          value: $(params.gitrevision)
+        - name: url
+          value: $(params.gitrepositoryurl)
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineRun
+      metadata:
+        name: pr-pipeline-$(uid)
+        namespace: $(params.namespace)
+      spec:
+        serviceAccount: tekton-triggers-admin
+        pipelineRef:
+          name: pr-pipeline
+        resources:
+          - name: source-repo
+            resourceRef:
+              name: source-repo-$(uid)
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: catservice-pr-pipelinebinding
+  namespace: getting-started
+spec:
+  params:
+    - name: gitrevision
+      value: $(body.head_commit.id)
+    - name: namespace
+      value: catservice-pr
+    - name: gitrepositoryurl
+      value: "https://github.com/$(body.repository.full_name)"
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: catservice-pr-listener
+  namespace: getting-started
+spec:
+  serviceType: LoadBalancer
+  serviceAccountName: tekton-triggers-admin
+  triggers:
+    - interceptor:
+        objectRef:
+          kind: Service
+          name: gh-validate
+          apiVersion: v1
+          namespace: getting-started
+      bindings:
+      - name: catservice-pr-pipelinebinding
+      template:
+        name: catservice-pr-triggertemplate
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gh-validate
+  namespace: getting-started
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gh-validate
+  template:
+    metadata:
+     labels:
+        app: gh-validate
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: validate
+          image: github.com/tektoncd/triggers/cmd/gh-validate
+          env:
+            - name: GITHUB_SECRET_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: webhook-secret
+                  key: secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gh-validate
+  namespace: getting-started
+spec:
+  type: ClusterIP
+  selector:
+    app: gh-validate
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

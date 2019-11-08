@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: pr-pipeline
+spec:
+  resources:
+  - name: source-repo
+    type: git
+  tasks:
+  - name: unit-test
+    taskRef:
+      name: golang-test
+    params:
+    - name: package
+      value: github.com/bobcatfish/catservice
+    resources:
+      inputs:
+      - name: source
+        resource: source-repo

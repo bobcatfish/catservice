@@ -1,6 +1,36 @@
-This is a POC of a canary deployment with Tekton!
+# Tekton Pipelines
 
-## Running the Pipeline
+We have 2 pipelines:
+* [pr-pipline.yaml](./pr-pipeline.yaml) is for testing before merging
+* [deploy-pipeline.yaml](./deploy-pipeline.yaml) is for testing after merging
+
+## Triggers
+
+Triggering is configured with [triggers.yaml](./triggers.yaml).
+
+```bash
+# Have to build the github validator
+ko apply -f tekton/triggers.yaml
+```
+
+## Running the PR Pipeline
+
+This Pipeline uses [golang-test](https://github.com/tektoncd/catalog/tree/master/golang#golang-test) 
+([golang-test.yaml](golang-test.yaml))
+which is copied from [the tekton catalog](https://github.com/tektoncd/catalog).
+
+```bash
+kubectl apply -f tekton/golang-test.yaml
+kubectl apply -f tekton/pr-pipeline.yaml
+kubectl apply -f tekton/resources.yaml
+
+# Make new runs with cli
+tkn pipeline start pr-pipeline -r source-repo=catservice
+```
+
+## Running the Deploy Pipeline
+
+This is a POC of a canary deployment with Tekton!
 
 ```bash
 # TODO: better way to support pipeline level tags + kaniko building
@@ -18,13 +48,12 @@ kubectl apply -f tekton/pipeline.yaml
 # kubectl apply -f tekton/resources-cluster.yaml
 kubectl apply -f tekton/resources.yaml
 
-
 # Make new runs with cli
 tkn pipeline start canary-pipeline -r source-repo=catservice -r image=christie-catservice-image -r cluster=catservice-cluster -p tag=0.10.0
 ```
 
 
-## Creating a GKE cluster with Istio & Prometheus
+### Creating a GKE cluster with Istio & Prometheus
 
 ```bash
 export PROJECT_ID=christiewilson-catfactory
@@ -55,7 +84,7 @@ kubectl create clusterrolebinding cluster-admin-binding \
 kubectl -n istio-system apply -f  https://storage.googleapis.com/gke-release/istio/release/1.0.6-gke.3/patches/install-prometheus.yaml
 ```
 
-## Once it's setup
+### Once it's setup
 
 Finding the external IP of the ingress gateway:
 
