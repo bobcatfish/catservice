@@ -94,6 +94,92 @@ spec:
       template:
         name: catservice-pr-triggertemplate
 ---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: catservice-merge-triggertemplate
+  namespace: getting-started
+spec:
+  params:
+    - name: gitrevision
+      description: The git revision
+      default: master
+    - name: gitrepositoryurl
+      description: The git repository url
+    - name: namespace
+      description: The namespace to create the resources
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineResource
+      metadata:
+        name: source-repo-$(uid)
+        namespace: $(params.namespace)
+      spec:
+        type: git
+        params:
+        - name: revision
+          value: $(params.gitrevision)
+        - name: url
+          value: $(params.gitrepositoryurl)
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineRun
+      metadata:
+        name: merge-pipeline-$(uid)
+        namespace: $(params.namespace)
+      spec:
+        serviceAccount: tekton-triggers-admin
+        pipelineRef:
+          name: canary-pipeline
+        params:
+          - name: tag
+            value: $(uid)
+        resources:
+          - name: source-repo
+            resourceRef:
+              name: source-repo-$(uid)
+          - name: image
+            resourceRef:
+              name: christie-catservice-image
+          - name: cluster
+            resourceRef:
+              name: catservice-cluster
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: catservice-merge-pipelinebinding
+  namespace: getting-started
+spec:
+  params:
+    - name: gitrevision
+      value: $(body.pull_request.head.sha)
+    - name: namespace
+      value: getting-started
+    - name: gitrepositoryurl
+      value: "https://github.com/$(body.repository.full_name)"
+    - name: filterformerge
+      value: $(body.pull_request.merged)
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: catservice-merge-listener
+  namespace: getting-started
+spec:
+  serviceType: LoadBalancer
+  serviceAccountName: tekton-triggers-admin
+  triggers:
+    - interceptor:
+        objectRef:
+          kind: Service
+          name: gh-validate
+          apiVersion: v1
+          namespace: getting-started
+      bindings:
+      - name: catservice-merge-pipelinebinding
+      template:
+        name: catservice-merge-triggertemplate
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
