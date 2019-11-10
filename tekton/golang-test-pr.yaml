@@ -64,8 +64,18 @@ spec:
             "Description": "Tests failed"
           }
       EOF
+        else
+          cat <<EOF > /workspace/output/pr/status/tekton.json
+          {
+            "ID": "tekton",
+            "Code": "success",
+            "Description": "Tests Passed!"
+          }
+      EOF
         fi
       fi
+      exit $exit_code
+
     env:
     - name: GOPATH
       value: /workspace
