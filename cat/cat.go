@@ -31,7 +31,7 @@ func Yoshimi() *Cat {
 	return &Cat{
 		Name:    "Yoshimi",
 		Mood:    "grouchy",
-		Image:   "yoshimi.jpg",
+		Image:   "yoshimi2.jpg",
 		Age:     AgeInCatYears(17),
 		Pronoun: "She",
 	}
