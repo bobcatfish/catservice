@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
   name: canary-deployment
+  namespace: getting-started
 spec:
   inputs:
     params:
@@ -26,7 +27,7 @@ spec:
   steps:
   - name: create-yq-deployment-script
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command:
     - /bin/sh
     args:
@@ -35,12 +36,12 @@ spec:
       set -e
       set -x
       export YQ_CONFIG="/builder/home/yq-deployment-config.yaml"
-      export NAME="$(yq read ${inputs.params.pathToDeployment} metadata.name)-canary"
+      export NAME="$(yq read $(inputs.params.pathToDeployment) metadata.name)-canary"
 
       cat <<EOF > $YQ_CONFIG
       metadata.name: $NAME
       spec.selector.matchLabels.version: canary
-      spec.template.spec.containers[0].image: ${inputs.resources.image.url}:${inputs.params.tag}
+      spec.template.spec.containers[0].image: $(inputs.resources.image.url):$(inputs.params.tag)
       # Update version label, the app label will be the same
       spec.template.metadata.labels.version: canary
       EOF
@@ -49,25 +50,25 @@ spec:
 
   - name: create-canary-deployment-config
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['yq']
     args:
     - w
     - -i
     - -s
     - /builder/home/yq-deployment-config.yaml
-    - ${inputs.params.pathToDeployment}
+    - $(inputs.params.pathToDeployment)
 
   - name: cat-deployment
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['cat']
     args:
-    - ${inputs.params.pathToDeployment}
+    - $(inputs.params.pathToDeployment)
 
   - name: create-yq-hpa-script
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command:
     - /bin/sh
     args:
@@ -76,8 +77,8 @@ spec:
       set -e
       set -x
       export YQ_CONFIG="/builder/home/yq-hpa-config.yaml"
-      export NAME="$(yq read ${inputs.params.pathToHPA} metadata.name)-canary"
-      export SCALE_TARGET="$(yq read ${inputs.params.pathToHPA} spec.scaleTargetRef.name)-canary"
+      export NAME="$(yq read $(inputs.params.pathToHPA) metadata.name)-canary"
+      export SCALE_TARGET="$(yq read $(inputs.params.pathToHPA) spec.scaleTargetRef.name)-canary"
 
       cat <<EOF > $YQ_CONFIG
       metadata.name: $NAME
@@ -88,25 +89,25 @@ spec:
 
   - name: create-canary-hpa-config
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['yq']
     args:
     - w
     - -i
     - -s
     - /builder/home/yq-hpa-config.yaml
-    - ${inputs.params.pathToHPA}
+    - $(inputs.params.pathToHPA)
 
   - name: cat-hpa
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['cat']
     args:
-    - ${inputs.params.pathToHPA}
+    - $(inputs.params.pathToHPA)
 
   - name: create-yq-destinationrule-script
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command:
     - /bin/sh
     args:
@@ -125,25 +126,25 @@ spec:
 
   - name: create-canary-destinationrule-config
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['yq']
     args:
     - w
     - -i
     - -s
     - /builder/home/yq-destinationrule-config.yaml
-    - ${inputs.params.pathToDestinationRule}
+    - $(inputs.params.pathToDestinationRule)
 
   - name: cat-destinationrule
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['cat']
     args:
-    - ${inputs.params.pathToDestinationRule}
+    - $(inputs.params.pathToDestinationRule)
 
   - name: create-yq-virtualservice-script
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command:
     - /bin/sh
     args:
@@ -152,7 +153,7 @@ spec:
       set -e
       set -x
       export YQ_CONFIG="/builder/home/yq-virtualservice-config.yaml"
-      export HOST="$(yq read ${inputs.params.pathToVirtualService} spec.http[0].route[0].destination.host)"
+      export HOST="$(yq read $(inputs.params.pathToVirtualService) spec.http[0].route[0].destination.host)"
 
       cat <<EOF > $YQ_CONFIG
       spec.http[0].route[1].destination.host: $HOST
@@ -164,36 +165,36 @@ spec:
 
   - name: create-canary-virtualservice-config
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['yq']
     args:
     - w
     - -i
     - -s
     - /builder/home/yq-virtualservice-config.yaml
-    - ${inputs.params.pathToVirtualService}
+    - $(inputs.params.pathToVirtualService)
 
   - name: cat-virtualservice
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['cat']
     args:
-    - ${inputs.params.pathToVirtualService}
+    - $(inputs.params.pathToVirtualService)
 
 
   - name: apply-canaries
     image: lachlanevenson/k8s-kubectl
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['kubectl']
     args:
     - 'apply'
     - '--kubeconfig'
-    - '/workspace/${inputs.resources.cluster.name}/kubeconfig'
+    - '/workspace/$(inputs.resources.cluster.name)/kubeconfig'
     - '-f'
-    - ${inputs.params.pathToDeployment}
+    - $(inputs.params.pathToDeployment)
     - '-f'
-    - ${inputs.params.pathToHPA}
+    - $(inputs.params.pathToHPA)
     - '-f'
-    - ${inputs.params.pathToDestinationRule}
+    - $(inputs.params.pathToDestinationRule)
     - '-f'
-    - ${inputs.params.pathToVirtualService}
+    - $(inputs.params.pathToVirtualService)

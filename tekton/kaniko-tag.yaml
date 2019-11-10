@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
   name: kaniko-tag
+  namespace: getting-started
 spec:
   inputs:
     params:
@@ -33,6 +34,6 @@ spec:
       value: /builder/home/.docker
     command:
     - /kaniko/executor
-    - --dockerfile=${inputs.params.DOCKERFILE}
-    - --context=/workspace/source/${inputs.params.CONTEXT} # The user does not need to care the workspace and the source.
-    - --destination=${outputs.resources.image.url}:${inputs.params.TAG}
+    - --dockerfile=$(inputs.params.DOCKERFILE)
+    - --context=/workspace/source/$(inputs.params.CONTEXT) # The user does not need to care the workspace and the source.
+    - --destination=$(outputs.resources.image.url):$(inputs.params.TAG)

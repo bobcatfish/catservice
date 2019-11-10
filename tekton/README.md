@@ -13,11 +13,15 @@ Triggering is configured with [triggers.yaml](./triggers.yaml).
 ko apply -f tekton/triggers.yaml
 ```
 
-## Running the PR Pipeline
+## Running the Pull Request Pipeline
 
 This Pipeline uses [golang-test](https://github.com/tektoncd/catalog/tree/master/golang#golang-test) 
 ([golang-test.yaml](golang-test.yaml))
-which is copied from [the tekton catalog](https://github.com/tektoncd/catalog).
+which is copied from [the tekton catalog](https://github.com/tektoncd/catalog),
+but heavily modified to update a
+[Pull Request resource](https://github.com/tektoncd/pipeline/blob/master/docs/resources.md#pull-request-resource)
+before we have support for
+[taking actions on failure](https://github.com/tektoncd/pipeline/issues/1376).
 
 ```bash
 kubectl apply -f tekton/golang-test.yaml
@@ -40,7 +44,7 @@ kubectl apply -f tekton/canary-deployment.yaml
 kubectl apply -f tekton/scale.yaml
 kubectl apply -f tekton/update-image.yaml
 kubectl apply -f tekton/remove-canary-deployment.yaml
-kubectl apply -f tekton/pipeline.yaml
+kubectl apply -f tekton/deploy-pipeline.yaml
 
 # To get credentials for the target cluster:
 # kubectl get serviceaccounts robot -o yaml -n catspace

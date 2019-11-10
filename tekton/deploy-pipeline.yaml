@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
 metadata:
   name: canary-pipeline
+  namespace: getting-started
 spec:
   params:
   - name: tag
@@ -19,7 +20,7 @@ spec:
       name: kaniko-tag
     params:
     - name: TAG
-      value: ${params.tag}
+      value: $(params.tag)
     resources:
       inputs:
       - name: source
@@ -40,7 +41,7 @@ spec:
     - name: pathToDestinationRule
       value: "config/700-destinationrule.yaml"
     - name: tag
-      value: ${params.tag}
+      value: $(params.tag)
     resources:
       inputs:
       - name: source
@@ -50,42 +51,8 @@ spec:
       - name: image
         resource: image
         from: [build-image]
-  - name: scale-canary-90
-    runAfter: [create-canary]
-    taskRef:
-      name: scale
-    params:
-    - name: baselinePercent
-      value: "90"
-    - name: canaryPercent
-      value: "10"
-    - name: pathToVirtualService
-      value: "config/600-virtualservice.yaml"
-    resources:
-      inputs:
-      - name: source
-        resource: source-repo
-      - name: cluster
-        resource: cluster
-  - name: scale-canary-75
-    runAfter: [scale-canary-90]
-    taskRef:
-      name: scale
-    params:
-    - name: baselinePercent
-      value: "75"
-    - name: canaryPercent
-      value: "25"
-    - name: pathToVirtualService
-      value: "config/600-virtualservice.yaml"
-    resources:
-      inputs:
-      - name: source
-        resource: source-repo
-      - name: cluster
-        resource: cluster
   - name: scale-canary-50
-    runAfter: [scale-canary-75]
+    runAfter: [create-canary]
     taskRef:
       name: scale
     params:
@@ -109,7 +76,7 @@ spec:
     - name: pathToDeployment
       value: "config/200-deployment.yaml"
     - name: tag
-      value: ${params.tag}
+      value: $(params.tag)
     resources:
       inputs:
       - name: source
