@@ -21,6 +21,7 @@ which is copied from [the tekton catalog](https://github.com/tektoncd/catalog).
 
 ```bash
 kubectl apply -f tekton/golang-test.yaml
+kubectl apply -f tekton/set-status.yaml
 kubectl apply -f tekton/pr-pipeline.yaml
 kubectl apply -f tekton/resources.yaml
 

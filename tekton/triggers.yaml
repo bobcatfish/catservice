@@ -10,9 +10,25 @@ spec:
       default: master
     - name: gitrepositoryurl
       description: The git repository url
+    - name: pullrequesturl
+      description: The url of the pull reuqest
     - name: namespace
       description: The namespace to create the resources
   resourcetemplates:
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineResource
+      metadata:
+        name: pr-$(uid)
+        namespace: $(params.namespace)
+      spec:
+        type: pullRequest
+        params:
+        - name: url
+          value: $(params.pullrequesturl)
+        secrets:
+        - secretName: webhook-secret
+          secretKey: token
+          fieldName: githubToken
     - apiVersion: tekton.dev/v1alpha1
       kind: PipelineResource
       metadata:
@@ -38,6 +54,9 @@ spec:
           - name: source-repo
             resourceRef:
               name: source-repo-$(uid)
+          - name: pr
+            resourceRef:
+              name: pr-$(uid)
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerBinding
@@ -47,11 +66,13 @@ metadata:
 spec:
   params:
     - name: gitrevision
-      value: $(body.head_commit.id)
+      value: $(body.pull_request.head.sha)
     - name: namespace
-      value: catservice-pr
+      value: getting-started
     - name: gitrepositoryurl
       value: "https://github.com/$(body.repository.full_name)"
+    - name: pullrequesturl
+      value: $(body.pull_request.html_url)
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: EventListener
