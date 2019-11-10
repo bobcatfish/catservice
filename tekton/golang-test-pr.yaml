@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: golang-test
+  name: golang-test-pr
   namespace: getting-started
 spec:
   inputs:
@@ -27,9 +27,15 @@ spec:
       description: "value of module support"
       default: auto
     resources:
+    - name: pr
+      type: pullRequest
     - name: source
       type: git
       targetPath: src/$(inputs.params.package)
+  outputs:
+    resources:
+    - name: pr
+      type: pullRequest
   steps:
   - name: unit-test
     image: golang:$(inputs.params.version)
@@ -37,8 +43,27 @@ spec:
     command:
     - /bin/bash
     args:
-    - -c
-    - "go test $(inputs.params.flags) $(inputs.params.packages)"
+    - -ce
+    - |
+      set -ex
+      cp -r /workspace/pr/ /workspace/output/
+
+      set +e
+      out=$(go test $(inputs.params.flags) $(inputs.params.packages))
+      exit_code=$?
+      set -e
+
+      if [[ $exit_code -ne 0 ]]; then
+        cat <<EOF > /workspace/output/pr/status/tekton.json
+        {
+          "ID": "tekton",
+          "Code": "failure",
+          "Description": "Tests failed"
+        }
+      EOF
+      fi
+      exit $exit_code
+
     env:
     - name: GOPATH
       value: /workspace

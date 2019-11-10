@@ -26,7 +26,7 @@ spec:
   - name: unit-test
     runAfter: [setstatus-inprogress]
     taskRef:
-      name: golang-test
+      name: golang-test-pr
     params:
     - name: package
       value: github.com/bobcatfish/catservice

@@ -157,8 +157,6 @@ spec:
       value: getting-started
     - name: gitrepositoryurl
       value: "https://github.com/$(body.repository.full_name)"
-    - name: filterformerge
-      value: $(body.pull_request.#(merged==true))
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: EventListener
