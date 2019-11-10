@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1alpha1
 kind: Condition
 metadata:
   name: merged-pr
+  namespace: getting-started
 spec:
   params:
     - name: merged
