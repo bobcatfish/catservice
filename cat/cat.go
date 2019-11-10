@@ -21,7 +21,10 @@ type Cat struct {
 // AgeInCatYears will look at how old c is in human years and convert that to the
 // cat years equivalent.
 func AgeInCatYears(hoomanYears int) int {
-	return hoomanYears * 7
+	if hoomanYears <= 2 {
+		return hoomanYears * 25 / 4.0
+	}
+	return ((hoomanYears - 2) * 2) + 25
 }
 
 // Yoshimi is my ancient cat.
@@ -29,7 +32,7 @@ func Yoshimi() *Cat {
 	return &Cat{
 		Name:    "Yoshimi",
 		Mood:    "grouchy",
-		Image:   "yoshimi.jpg",
+		Image:   "yoshimi2.jpg",
 		Age:     AgeInCatYears(17),
 		Pronoun: "She",
 	}

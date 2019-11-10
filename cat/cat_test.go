@@ -11,13 +11,13 @@ func TestAgeInCatYears(t *testing.T) {
 		catYears   int
 	}{{
 		humanYears: 20,
-		catYears:   140,
+		catYears:   61,
 	}, {
 		humanYears: 1,
-		catYears:   7,
+		catYears:   6,
 	}, {
 		humanYears: 4,
-		catYears:   28,
+		catYears:   29,
 	}}
 	for _, tc := range tests {
 		t.Run(fmt.Sprintf("%d", tc.humanYears), func(t *testing.T) {
