@@ -50,6 +50,9 @@ spec:
         serviceAccount: tekton-triggers-admin
         pipelineRef:
           name: pr-pipeline
+        params:
+        - name: report-to-github
+          value: "yes"
         resources:
           - name: source-repo
             resourceRef:

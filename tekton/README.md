@@ -30,7 +30,7 @@ kubectl apply -f tekton/pr-pipeline.yaml
 kubectl apply -f tekton/resources.yaml
 
 # Make new runs with cli
-tkn pipeline start pr-pipeline -r source-repo=catservice
+tkn pipeline start pr-pipeline
 ```
 
 ## Running the Deploy Pipeline

@@ -4,6 +4,9 @@ metadata:
   name: pr-pipeline
   namespace: getting-started
 spec:
+  params:
+  - name: report-to-github
+    default: "no"
   resources:
   - name: source-repo
     type: git
@@ -28,6 +31,8 @@ spec:
     taskRef:
       name: golang-test-pr
     params:
+    - name: report-to-github
+      value: $(params.report-to-github)
     - name: package
       value: github.com/bobcatfish/catservice
     resources:
@@ -39,17 +44,3 @@ spec:
       outputs:
       - name: pr
         resource: pr
-  - name: setstatus-success
-    runAfter: [unit-test]
-    taskRef:
-      name: set-status
-    resources:
-      inputs:
-      - name: pr
-        resource: pr
-      outputs:
-      - name: pr
-        resource: pr
-    params:
-    - name: status
-      value: "success"

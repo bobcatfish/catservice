@@ -6,23 +6,18 @@ import (
 )
 
 func TestAgeInCatYears(t *testing.T) {
-	age := AgeInCatYears(20)
-	expectedAge := 140
-	if age != expectedAge {
-		t.Errorf("Expected age %d but got %d", age, expectedAge)
-	}
 	tests := []struct {
 		humanYears int
 		catYears   int
 	}{{
 		humanYears: 20,
-		catYears:   140,
+		catYears:   61,
 	}, {
 		humanYears: 1,
-		catYears:   7,
+		catYears:   6,
 	}, {
 		humanYears: 4,
-		catYears:   28,
+		catYears:   29,
 	}}
 	for _, tc := range tests {
 		t.Run(fmt.Sprintf("%d", tc.humanYears), func(t *testing.T) {
