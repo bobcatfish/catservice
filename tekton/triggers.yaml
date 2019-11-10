@@ -108,6 +108,8 @@ spec:
       description: The git repository url
     - name: namespace
       description: The namespace to create the resources
+    - name: merged
+      description: If true indicates the PR was merged
   resourcetemplates:
     - apiVersion: tekton.dev/v1alpha1
       kind: PipelineResource
@@ -133,6 +135,8 @@ spec:
         params:
           - name: tag
             value: $(uid)
+          - mame: merged
+            value: $(params.merged)
         resources:
           - name: source-repo
             resourceRef:
@@ -157,6 +161,8 @@ spec:
       value: getting-started
     - name: gitrepositoryurl
       value: "https://github.com/$(body.repository.full_name)"
+    - name: merged
+      value: $(body.pull_request.merged)
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: EventListener

@@ -40,7 +40,6 @@ This is a POC of a canary deployment with Tekton!
 ```bash
 # TODO: better way to support pipeline level tags + kaniko building
 kubectl apply -f tekton/kaniko-tag.yaml
-kubectl apply -f tekton/golang-test.yaml
 kubectl apply -f tekton/canary-deployment.yaml
 kubectl apply -f tekton/scale.yaml
 kubectl apply -f tekton/update-image.yaml
