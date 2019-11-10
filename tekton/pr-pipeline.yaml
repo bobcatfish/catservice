@@ -2,12 +2,29 @@ apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
 metadata:
   name: pr-pipeline
+  namespace: getting-started
 spec:
   resources:
   - name: source-repo
     type: git
+  - name: pr
+    type: pullRequest
   tasks:
+  - name: setstatus-inprogress
+    taskRef:
+      name: set-status
+    resources:
+      inputs:
+      - name: pr
+        resource: pr
+      outputs:
+      - name: pr
+        resource: pr
+    params:
+    - name: status
+      value: "in_progress"
   - name: unit-test
+    runAfter: [setstatus-inprogress]
     taskRef:
       name: golang-test
     params:
@@ -17,3 +34,22 @@ spec:
       inputs:
       - name: source
         resource: source-repo
+      - name: pr
+        resource: pr
+      outputs:
+      - name: pr
+        resource: pr
+  - name: setstatus-success
+    runAfter: [unit-test]
+    taskRef:
+      name: set-status
+    resources:
+      inputs:
+      - name: pr
+        resource: pr
+      outputs:
+      - name: pr
+        resource: pr
+    params:
+    - name: status
+      value: "success"
