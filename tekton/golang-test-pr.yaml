@@ -6,6 +6,8 @@ metadata:
 spec:
   inputs:
     params:
+    - name: report-to-github
+      description: whether or not to report failure on the PR status
     - name: package
       description: package (and its children) under test
     - name: packages
@@ -53,14 +55,16 @@ spec:
       exit_code=$?
       set -e
 
-      if [[ $exit_code -ne 0 ]]; then
-        cat <<EOF > /workspace/output/pr/status/tekton.json
-        {
-          "ID": "tekton",
-          "Code": "failure",
-          "Description": "Tests failed"
-        }
+      if [[ $(inputs.params.report-to-github) -eq "yes" ]]; then
+        if [[ $exit_code -ne 0 ]]; then
+          cat <<EOF > /workspace/output/pr/status/tekton.json
+          {
+            "ID": "tekton",
+            "Code": "failure",
+            "Description": "Tests failed"
+          }
       EOF
+        fi
       fi
       exit $exit_code
 
