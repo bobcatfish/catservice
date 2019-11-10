@@ -135,7 +135,7 @@ spec:
         params:
           - name: tag
             value: $(uid)
-          - mame: merged
+          - name: merged
             value: $(params.merged)
         resources:
           - name: source-repo

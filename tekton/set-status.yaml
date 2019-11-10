@@ -23,7 +23,8 @@ spec:
     - -c
     - |
         set -ex
-        cp -r /workspace/pr/ /workspace/output/
+        #cp -r /workspace/pr/ /workspace/output/
+        mkdir -p /workspace/output/pr/status/
         cat <<EOF > /workspace/output/pr/status/status.json
         {
           "ID": "tekton",
