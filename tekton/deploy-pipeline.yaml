@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
 metadata:
   name: canary-pipeline
+  namespace: getting-started
 spec:
   params:
   - name: tag

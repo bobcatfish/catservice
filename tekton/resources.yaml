@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
   name: christie-catservice-image
+  namespace: getting-started
 spec:
   type: image
   params:
@@ -12,6 +13,7 @@ apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
   name: catservice
+  namespace: getting-started
 spec:
   type: git
   params:
