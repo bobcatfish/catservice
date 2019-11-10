@@ -24,7 +24,8 @@ spec:
     - |
         set -ex
         cp -r /workspace/pr/ /workspace/output/
-        cat <<EOF > /workspace/output/pr/status/status.json
+        ls -laR /workspace/output/pr
+        cat <<EOF > /workspace/output/pr/status/tekton.json
         {
           "ID": "tekton",
           "Code": "$(inputs.params.status)",

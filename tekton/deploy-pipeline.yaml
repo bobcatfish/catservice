@@ -1,4 +1,17 @@
 apiVersion: tekton.dev/v1alpha1
+kind: Condition
+metadata:
+  name: merged-pr
+  namespace: getting-started
+spec:
+  params:
+    - name: merged
+  check:
+    image: alpine
+    command: ["/bin/sh"]
+    args: ['-c', '[ "$(params.merged)" == "true" ]']
+---
+apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
 metadata:
   name: canary-pipeline
@@ -7,6 +20,8 @@ spec:
   params:
   - name: tag
     description: Tag to use for newly built image
+  - name: merged
+    description: The value of pull_request.merged from the PR event
   resources:
   - name: source-repo
     type: git
@@ -15,18 +30,12 @@ spec:
   - name: cluster
     type: cluster
   tasks:
-  - name: unit-test
-    taskRef:
-      name: golang-test
-    params:
-    - name: package
-      value: github.com/bobcatfish/catservice
-    resources:
-      inputs:
-      - name: source
-        resource: source-repo
   - name: build-image
-    runAfter: [unit-test]
+    conditions:
+    - conditionRef: merged-pr
+      params:
+        - name: merged
+          value: $(params.merged)
     taskRef:
       name: kaniko-tag
     params:

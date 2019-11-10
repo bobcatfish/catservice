@@ -6,15 +6,20 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"path"
 
 	"github.com/bobcatfish/catservice/cat"
 )
 
 func sweetCatBlog(w http.ResponseWriter, r *http.Request) {
-	y := cat.Yoshimi()
+	if r.URL.Path == "" || r.URL.Path == "/" {
+		y := cat.Yoshimi()
 
-	tmpl := template.Must(template.ParseFiles("static/index.html"))
-	tmpl.Execute(w, y)
+		tmpl := template.Must(template.ParseFiles("static/index.html"))
+		tmpl.Execute(w, y)
+	} else {
+		http.ServeFile(w, r, path.Join("static", r.URL.Path))
+	}
 }
 
 func main() {
