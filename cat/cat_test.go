@@ -11,7 +11,7 @@ func TestAgeInCatYears(t *testing.T) {
 		catYears   int
 	}{{
 		humanYears: 20,
-		catYears:   140,
+		catYears:   61,
 	}, {
 		humanYears: 1,
 		catYears:   6,
