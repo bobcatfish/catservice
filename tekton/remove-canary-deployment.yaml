@@ -23,7 +23,7 @@ spec:
   steps:
   - name: get-names
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command:
     - /bin/sh
     args:
@@ -31,9 +31,9 @@ spec:
     - |
       set -e
       set -x
-      export DEPLOYMENT_NAME="$(yq read ${inputs.params.pathToDeployment} metadata.name)-canary"
-      export HPA_NAME="$(yq read ${inputs.params.pathToHPA} metadata.name)-canary"
-      export NAMESPACE="$(yq read ${inputs.params.pathToDeployment} metadata.namespace)"
+      export DEPLOYMENT_NAME="$(yq read $(inputs.params.pathToDeployment) metadata.name)-canary"
+      export HPA_NAME="$(yq read $(inputs.params.pathToHPA) metadata.name)-canary"
+      export NAMESPACE="$(yq read $(inputs.params.pathToDeployment) metadata.namespace)"
 
       echo $DEPLOYMENT_NAME > "/builder/home/deployment_name"
       echo $HPA_NAME > "/builder/home/hpa_name"
@@ -41,7 +41,7 @@ spec:
 
   - name: delete-deployment
     image: lachlanevenson/k8s-kubectl
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command:
     - /bin/sh
     args:
@@ -54,21 +54,21 @@ spec:
       export DEPLOYMENT_NAME="$(cat /builder/home/deployment_name)"
       export NAMESPACE="$(cat /builder/home/namespace)"
 
-      kubectl --kubeconfig /workspace/${inputs.resources.cluster.name}/kubeconfig \
+      kubectl --kubeconfig /workspace/$(inputs.resources.cluster.name)/kubeconfig \
         delete horizontalpodautoscaler $HPA_NAME -n $NAMESPACE
-      kubectl --kubeconfig /workspace/${inputs.resources.cluster.name}/kubeconfig \
+      kubectl --kubeconfig /workspace/$(inputs.resources.cluster.name)/kubeconfig \
         delete deployment $DEPLOYMENT_NAME -n $NAMESPACE
 
   - name: reset-virtual-service
     image: lachlanevenson/k8s-kubectl
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['kubectl']
     args:
     - 'apply'
     - '--force'
     - '--kubeconfig'
-    - '/workspace/${inputs.resources.cluster.name}/kubeconfig'
+    - '/workspace/$(inputs.resources.cluster.name)/kubeconfig'
     - '-f'
-    - ${inputs.params.pathToDestinationRule}
+    - $(inputs.params.pathToDestinationRule)
     - '-f'
-    - ${inputs.params.pathToVirtualService}
+    - $(inputs.params.pathToVirtualService)

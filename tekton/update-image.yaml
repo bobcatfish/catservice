@@ -21,7 +21,7 @@ spec:
   steps:
   - name: create-yq-deployment-script
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command:
     - /bin/sh
     args:
@@ -32,38 +32,38 @@ spec:
       export YQ_CONFIG="/builder/home/yq-deployment-config.yaml"
 
       cat <<EOF > $YQ_CONFIG
-      spec.template.spec.containers[0].image: ${inputs.resources.image.url}:${inputs.params.tag}
+      spec.template.spec.containers[0].image: $(inputs.resources.image.url):$(inputs.params.tag)
       EOF
 
       cat $YQ_CONFIG
 
   - name: create-canary-deployment-config
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['yq']
     args:
     - w
     - -i
     - -s
     - /builder/home/yq-deployment-config.yaml
-    - ${inputs.params.pathToDeployment}
+    - $(inputs.params.pathToDeployment)
 
   - name: cat-deployment
     image: mikefarah/yq
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['cat']
     args:
-    - ${inputs.params.pathToDeployment}
+    - $(inputs.params.pathToDeployment)
 
   - name: apply
     image: lachlanevenson/k8s-kubectl
-    workingDir: "${inputs.resources.source.path}"
+    workingDir: "$(inputs.resources.source.path)"
     command: ['kubectl']
     args:
     - 'apply'
     - '--kubeconfig'
-    - '/workspace/${inputs.resources.cluster.name}/kubeconfig'
+    - '/workspace/$(inputs.resources.cluster.name)/kubeconfig'
     - '-f'
-    - ${inputs.params.pathToDeployment}
+    - $(inputs.params.pathToDeployment)
   
   # TODO: once we can have git outputs, we should update the deployment in the repo

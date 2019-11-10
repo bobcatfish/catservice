@@ -20,7 +20,7 @@ spec:
       name: kaniko-tag
     params:
     - name: TAG
-      value: ${params.tag}
+      value: $(params.tag)
     resources:
       inputs:
       - name: source
@@ -41,7 +41,7 @@ spec:
     - name: pathToDestinationRule
       value: "config/700-destinationrule.yaml"
     - name: tag
-      value: ${params.tag}
+      value: $(params.tag)
     resources:
       inputs:
       - name: source
@@ -110,7 +110,7 @@ spec:
     - name: pathToDeployment
       value: "config/200-deployment.yaml"
     - name: tag
-      value: ${params.tag}
+      value: $(params.tag)
     resources:
       inputs:
       - name: source
