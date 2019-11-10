@@ -24,6 +24,8 @@ spec:
       - name: pr
         resource: pr
     params:
+    - name: report-to-github
+      value: $(params.report-to-github)
     - name: status
       value: "in_progress"
   - name: unit-test

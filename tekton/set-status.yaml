@@ -11,6 +11,7 @@ spec:
     params:
     - name: status
       type: string
+    - name: report-to-github
   outputs:
     resources:
     - name: pr
@@ -23,12 +24,14 @@ spec:
     - -c
     - |
         set -ex
-        cp -r /workspace/pr/ /workspace/output/
-        ls -laR /workspace/output/pr
-        cat <<EOF > /workspace/output/pr/status/tekton.json
-        {
-          "ID": "tekton",
-          "Code": "$(inputs.params.status)",
-          "Description": "Tekton is running"
-        }
+        if [[ $(inputs.params.report-to-github) -eq "yes" ]]; then
+          cp -r /workspace/pr/ /workspace/output/
+          ls -laR /workspace/output/pr
+          cat <<EOF > /workspace/output/pr/status/tekton.json
+          {
+            "ID": "tekton",
+            "Code": "$(inputs.params.status)",
+            "Description": "Tekton is running"
+          }
         EOF
+        fi
