@@ -18,13 +18,13 @@ ko apply -f tekton/triggers.yaml
 This Pipeline uses [golang-test](https://github.com/tektoncd/catalog/tree/master/golang#golang-test) 
 ([golang-test.yaml](golang-test.yaml))
 which is copied from [the tekton catalog](https://github.com/tektoncd/catalog),
-but heavily modified to update a
+but [golang-test-pr.yaml](golang-test-pr.yaml) is heavily modified to update a
 [Pull Request resource](https://github.com/tektoncd/pipeline/blob/master/docs/resources.md#pull-request-resource)
 before we have support for
 [taking actions on failure](https://github.com/tektoncd/pipeline/issues/1376).
 
 ```bash
-kubectl apply -f tekton/golang-test.yaml
+kubectl apply -f tekton/golang-test-pr.yaml
 kubectl apply -f tekton/set-status.yaml
 kubectl apply -f tekton/pr-pipeline.yaml
 kubectl apply -f tekton/resources.yaml
@@ -40,6 +40,7 @@ This is a POC of a canary deployment with Tekton!
 ```bash
 # TODO: better way to support pipeline level tags + kaniko building
 kubectl apply -f tekton/kaniko-tag.yaml
+kubectl apply -f tekton/golang-test.yaml
 kubectl apply -f tekton/canary-deployment.yaml
 kubectl apply -f tekton/scale.yaml
 kubectl apply -f tekton/update-image.yaml

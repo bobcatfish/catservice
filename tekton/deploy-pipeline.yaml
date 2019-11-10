@@ -15,7 +15,18 @@ spec:
   - name: cluster
     type: cluster
   tasks:
+  - name: unit-test
+    taskRef:
+      name: golang-test
+    params:
+    - name: package
+      value: github.com/bobcatfish/catservice
+    resources:
+      inputs:
+      - name: source
+        resource: source-repo
   - name: build-image
+    runAfter: [unit-test]
     taskRef:
       name: kaniko-tag
     params:
