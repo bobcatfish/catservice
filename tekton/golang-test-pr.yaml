@@ -74,7 +74,6 @@ spec:
       EOF
         fi
       fi
-      exit $exit_code
 
     env:
     - name: GOPATH
