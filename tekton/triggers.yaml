@@ -73,6 +73,9 @@ spec:
       value: "https://github.com/$(body.repository.full_name)"
     - name: pullrequesturl
       value: $(body.pull_request.html_url)
+    # This field isn't present in merge events
+    - name: filterfornotmerge
+      value: $(body.before)
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: EventListener
