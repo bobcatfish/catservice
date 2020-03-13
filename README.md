@@ -1,5 +1,6 @@
 # catservice
 Yay cats!
+Yay rego!
 
 ## Running it
 
