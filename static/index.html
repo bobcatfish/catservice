@@ -1,26 +1,25 @@
 <html>
 
 <head>
-  <title>クリスティの猫</title>
+  <title>Tektonの猫</title>
 </head>
 
 <style>
   body {
-    color: black;
-    background-color: cornflowerblue;
+    color: white;
+    background-color: black;
   }
 </style>
 
 <body>
-  <h2>{{.Name}}</h2>
-  <p>
-    My cat's name is {{.Name}}!
-    {{.Pronoun}} is often {{.Mood}}.
-  </p>
-  <p>
-    {{.Pronoun}} is {{.Age}} years old in cat years!
-  </p>
-  <img src="{{.Image}}">
+  {{ range .Cats }}
+    <h2>{{.DisplayName}}</h2>
+    <p>
+      My name is {{.Name}}!
+      I was the mascot for Tekton Pipelines {{.Release}}.
+    </p>
+    <img src="{{.Image}}" height="300">
+  {{ end }}
 </body>
 
 </html>

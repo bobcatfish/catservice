@@ -13,10 +13,8 @@ import (
 
 func sweetCatBlog(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "" || r.URL.Path == "/" {
-		y := cat.Yoshimi()
-
 		tmpl := template.Must(template.ParseFiles("static/index.html"))
-		tmpl.Execute(w, y)
+		tmpl.Execute(w, struct{Cats []cat.TektonCat}{Cats: cat.GetCatsOfTekton()})
 	} else {
 		http.ServeFile(w, r, path.Join("static", r.URL.Path))
 	}
