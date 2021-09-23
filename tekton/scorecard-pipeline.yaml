@@ -1,0 +1,61 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: "scorecard-go"
+spec:
+  params:
+  - name: path
+  - name: package
+  - name: secret-name
+  workspaces:
+  - name: source
+  steps:
+  - name: score-deps
+    image: bobcatfish/scorecard-go
+    workingDir: $(workspaces.source.path)
+    envFrom:
+    - secretRef:
+        name: $(params.secret-name)
+    command: ["scorecard.py"]
+    args: ["--path=$(params.path)", "--package=$(params.package)"]
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: "scorecard-pipeline"
+spec:
+  params:
+  - name: git-repo
+  - name: git-revision
+  - name: scorecard-package
+  - name: scorecard-secret-name
+  workspaces:
+  - name: git-source
+  tasks:
+  - name: fetch-from-git
+    taskRef:
+      name: git-clone
+    params:
+    - name: url
+      value: "https://$(params.git-repo)"
+    - name: revision
+      value: $(params.git-revision)
+    - name: subdirectory
+      value: $(params.git-repo)
+    workspaces:
+    - name: output
+      workspace: git-source
+  - name: score-dependencies
+    runAfter: [fetch-from-git]
+    taskRef:
+      name: "scorecard-go"
+    params:
+    - name: path
+      value: $(params.git-repo)
+    - name: package
+      value: $(params.scorecard-package)
+    - name: secret-name
+      value: $(params.scorecard-secret-name)
+    workspaces:
+    - name: source
+      workspace: git-source
