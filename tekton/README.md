@@ -1,8 +1,52 @@
 # Tekton Pipelines
 
-We have 2 pipelines:
+We have 3 pipelines:
+* [scorecard-pipeline.yaml](#running-the-scorecard-pipeline)
 * [pr-pipline.yaml](./pr-pipeline.yaml) is for testing before merging
 * [deploy-pipeline.yaml](./deploy-pipeline.yaml) is for testing after merging
+
+
+## Running the scorecard pipeline
+
+Workspace `github-token` must be bound to a secret which contains a value for the key
+[`GITHUB_AUTH_TOKEN`](https://github.com/ossf/scorecard#authentication-and-setup).
+
+For example:
+
+```bash
+kubectl create secret generic github-token --from-literal=GITHUB_AUTH_TOKEN=SOME-TOKEN
+```
+
+You'll need the `git-clone` `Task` installed:
+
+```bash
+tkn hub install task git-clone
+```
+
+You'll also need a PVC, e.g.:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: git-source
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+```
+
+### Running it with GitHub Actions
+
+1. Create the robot service account `kubectl apply -f config/800-github-serviceaccount.yaml`
+2. Find the name of the token with `kubectl get serviceaccounts github-robot -o yaml`
+3. Get the token, e.g. `kubectl get secret github-robot-token-dsdwf -o yaml`
+4. Base 64 decode the token
+
+Store as encrypted secret
 
 ## Triggers
 

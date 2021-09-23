@@ -1,0 +1,53 @@
+name: Score Dependencies
+
+on: [pull_request]
+
+jobs:
+  run-scorecard-on-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          cat << EOF > /tmp/kubeconfig
+          apiVersion: v1
+          clusters:
+            - cluster:
+                certificate-authority-data: ${{ secrets.CLUSTER_CA_DATA }}
+                server: ${{ secrets.CLUSTER_IP }}
+              name: eucalyptus
+          contexts:
+            - context:
+                cluster: eucalyptus
+                user: github-robot
+              name: eucalyptus
+          current-context: eucalyptus
+          kind: Config
+          preferences: {}
+          users:
+            - name: github-robot
+              user:
+                token: ${{ secrets.ROBOT_SA_TOKEN }}
+          EOF
+
+      - run: echo "KUBECONFIG=/tmp/kubeconfig" >> $GITHUB_ENV
+
+      - run: kubectl apply --filename tekton/scorecard-pipeline.yaml
+
+      - uses: jerop/tkn@v0.1.0
+        with:
+          version: v0.20.0
+
+      - run: tkn pr list
+      - run: |
+          tkn pipeline start \
+            -w name=git-source,volumeClaimTemplateFile=tekton/pvc-template.yaml \
+            -p git-repo=github.com/$GITHUB_REPOSITORY \
+            -p git-revision=$GITHUB_SHA \
+            -p scorecard-package=./ \
+            -p scorecard-secret-name=github-token \
+            --showlog \
+            scorecard-pipeline
+      - run: |
+          PIPELINE_RUN=$(tkn pipelinerun list --no-color |  awk 'NR==2' | awk '{ print $1 }')
+          echo "PIPELINE_RUN=$PIPELINE_RUN" >> $GITHUB_ENV
+      - run: kubectl get pipelinerun $PIPELINE_RUN -o jsonpath="{.status.conditions[?(@.type==\"Succeeded\")].status}" | grep True
