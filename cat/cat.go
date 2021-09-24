@@ -1,6 +1,7 @@
 package cat
 
 import (
+	"github.com/bobcatfish/rainbowhtml/rainbow"
 	"html/template"
 )
 
@@ -23,7 +24,7 @@ func GetCatsOfTekton() []TektonCat{
 	rainbowCats := []TektonCat{}
 	for _, cat := range catsOfTekton {
 		rainbowCats = append(rainbowCats, TektonCat{
-			DisplayName: template.HTML(cat.Name),
+			DisplayName: template.HTML(rainbow.Text(cat.Name)),
 			Name: cat.Name,
 			Image: cat.Image,
 			Release: cat.Release,
