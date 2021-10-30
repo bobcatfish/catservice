@@ -20,6 +20,7 @@ type TektonCat struct {
 }
 
 func GetCatsOfTekton() []TektonCat {
+	// rainbowCats is a a strange variable name b/c until we add the rainbow lib, they're just regular cats
 	rainbowCats := []TektonCat{}
 	for _, cat := range catsOfTekton {
 		rainbowCats = append(rainbowCats, TektonCat{
