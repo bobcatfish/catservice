@@ -35,10 +35,6 @@ func GetCatsOfTekton() []TektonCat {
 
 // catsOfTekton are some wonderful cats
 var catsOfTekton = []TektonCat{{
-	Name: "SuperFluff	",
-	Image:   "superfluff.jpeg",
-	Release: "v0.25.0",
-}, {
 	Name:    "Acadia",
 	Image:   "acadia_0.3.1.jpeg",
 	Release: "v0.4.0",
