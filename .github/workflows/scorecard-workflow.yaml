@@ -5,9 +5,21 @@ on:
     types: [opened, synchronize, reopened, closed]
 
 jobs:
+  run-tests:
+    # There is no explcii support for "merged" type, only closed, so unless we also want to run this every
+    # time a PR is closed without merging, we need to explicitly filter IN EVERY JOB
+    if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.action == 'reopened' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+      - name: Test
+        run: go test ./...
+  
   run-scorecard-on-dependencies:
-    # There is no explciit support for "merged" type, only closed, so unless we also want to run this every
-    # time a PR is closed without merging, we need to explicitly filter here
+    # There is no explcii support for "merged" type, only closed, so unless we also want to run this every
+    # time a PR is closed without merging, we need to explicitly filter IN EVERY JOB
     if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.action == 'reopened' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
