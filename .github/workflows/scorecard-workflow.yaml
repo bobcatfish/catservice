@@ -39,6 +39,7 @@ jobs:
 
       - run: tkn pr list
       - run: |
+          echo "HELLO FROM BRANCH"
           tkn pipeline start \
             -w name=git-source,volumeClaimTemplateFile=tekton/pvc-template.yaml \
             -p git-repo=github.com/$GITHUB_REPOSITORY \
