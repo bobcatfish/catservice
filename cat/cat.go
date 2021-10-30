@@ -19,19 +19,20 @@ type TektonCat struct {
 	Release string
 }
 
-func GetCatsOfTekton() []TektonCat{
+func GetCatsOfTekton() []TektonCat {
 	rainbowCats := []TektonCat{}
 	for _, cat := range catsOfTekton {
 		rainbowCats = append(rainbowCats, TektonCat{
 			DisplayName: template.HTML(cat.Name),
-			Name: cat.Name,
-			Image: cat.Image,
-			Release: cat.Release,
+			Name:        cat.Name,
+			Image:       cat.Image,
+			Release:     cat.Release,
 		})
 	}
 	return rainbowCats
 }
 
+// catsOfTekton are some wonderful cats
 var catsOfTekton = []TektonCat{{
 	Name:    "Acadia",
 	Image:   "acadia_0.3.1.jpeg",
@@ -61,4 +62,3 @@ var catsOfTekton = []TektonCat{{
 	Image:   "yoshimi_0.4.0.jpeg",
 	Release: "v0.4.0",
 }}
-
