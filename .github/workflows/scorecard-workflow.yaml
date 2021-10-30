@@ -29,6 +29,8 @@ jobs:
                 token: ${{ secrets.ROBOT_SA_TOKEN }}
           EOF
 
+      - run: echo "Running this for $GITHUB_REF"
+        
       - run: echo "KUBECONFIG=/tmp/kubeconfig" >> $GITHUB_ENV
 
       - run: kubectl apply --filename tekton/scorecard-pipeline.yaml
